@@ -42,21 +42,21 @@ export default function HomePage() {
 
   const handleSummarize = async () => {
     try {
-      setLoading(true)
-      const videoId = extractVideoId(videoUrl)
+      setLoading(true);
+      const videoId = extractVideoId(videoUrl);
       
       if (!videoId) {
-        toast.error('Please enter a valid YouTube URL')
-        return
+        toast.error('Please enter a valid YouTube URL');
+        return;
       }
 
-      window.location.href = `/summary?v=${videoId}`
-    } catch (error) {
-      toast.error('Failed to process video URL')
+      window.location.href = `/summary?v=${videoId}`;
+    } catch {
+      toast.error('Failed to process video URL');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <>
