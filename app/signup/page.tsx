@@ -34,8 +34,12 @@ export default function SignUp() {
       if (signInError) throw signInError;
 
       router.push('/dashboard');
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('An unknown error occurred');
+      }
     } finally {
       setLoading(false);
     }
@@ -84,4 +88,3 @@ export default function SignUp() {
     </div>
   );
 }
-

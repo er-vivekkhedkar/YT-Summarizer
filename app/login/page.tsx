@@ -1,20 +1,20 @@
 "use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { nhost } from '@/lib/nhost';
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { nhost } from "@/lib/nhost";
 
 export default function Login() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setError("");
     setLoading(true);
 
     try {
@@ -23,12 +23,16 @@ export default function Login() {
         password,
       });
 
-      if (signInError) throw signInError;
+      if (signInError) throw new Error(signInError.message);
 
-      router.push('/dashboard');
-      router.refresh(); // Refresh to update auth state
-    } catch (err: any) {
-      setError(err.message);
+      router.push("/dashboard");
+      router.refresh();
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("An unexpected error occurred.");
+      }
     } finally {
       setLoading(false);
     }
@@ -72,14 +76,16 @@ export default function Login() {
             className="w-full rounded bg-red-600 p-2 text-white hover:bg-red-700 disabled:opacity-50"
             disabled={loading}
           >
-            {loading ? 'Logging in...' : 'Log in'}
+            {loading ? "Logging in..." : "Log in"}
           </button>
         </form>
         <p className="text-sm text-gray-600">
-          Don&apos;t have an account? <Link href="/signup" className="text-primary hover:underline">Sign up</Link>
+          Don&apos;t have an account?{" "}
+          <Link href="/signup" className="text-primary hover:underline">
+            Sign up
+          </Link>
         </p>
       </div>
     </div>
   );
 }
-

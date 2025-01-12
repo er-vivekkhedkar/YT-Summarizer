@@ -12,9 +12,8 @@ export default function SummaryPage() {
   const [summary, setSummary] = useState('');
   const [loading, setLoading] = useState(true);
   const [readingTime, setReadingTime] = useState('');
-  const [error, setError] = useState('');
-  const [videoTitle, setVideoTitle] = useState('');
   const [warning, setWarning] = useState('');
+  const [videoTitle, setVideoTitle] = useState('');
   const searchParams = useSearchParams();
   const videoId = searchParams.get('v');
   const user = useUserData();
@@ -48,7 +47,6 @@ export default function SummaryPage() {
   const fetchSummary = useCallback(async (videoId: string) => {
     try {
       setLoading(true);
-      setError('');
       setWarning('');
 
       // First try to get video details
@@ -115,7 +113,6 @@ export default function SummaryPage() {
 
     } catch (error) {
       console.error('Error:', error);
-      setError(error instanceof Error ? error.message : 'Failed to generate summary');
       toast.error(error instanceof Error ? error.message : 'Failed to generate summary');
     } finally {
       setLoading(false);
@@ -222,12 +219,11 @@ export default function SummaryPage() {
               <p className="mt-4 text-gray-600">Analyzing video content...</p>
               <p className="text-sm text-gray-500">This may take a moment</p>
             </div>
-          ) : error ? (
+          ) : warning ? (
             <div className="flex flex-col items-center justify-center min-h-[400px] text-center">
-              <AlertCircle className="h-12 w-12 text-red-500 mb-4" />
-              <h2 className="text-xl font-semibold mb-2">Unable to Generate Summary</h2>
-              <p className="text-gray-600 mb-4">{error}</p>
-              <Button onClick={() => window.history.back()}>Go Back</Button>
+              <AlertCircle className="h-12 w-12 text-yellow-500 mb-4" />
+              <h2 className="text-xl font-semibold mb-2">Warning</h2>
+              <p className="text-gray-600 mb-4">{warning}</p>
             </div>
           ) : (
             <div className="grid gap-8">
@@ -248,15 +244,6 @@ export default function SummaryPage() {
                     <h1 className="text-2xl font-bold">{videoTitle}</h1>
                   )}
                 </>
-              )}
-
-              {warning && (
-                <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
-                  <div className="flex">
-                    <AlertCircle className="h-5 w-5 text-yellow-400 mr-2" />
-                    <p className="text-sm text-yellow-700">{warning}</p>
-                  </div>
-                </div>
               )}
 
               <div className="bg-white rounded-lg shadow-lg p-6">
@@ -318,4 +305,4 @@ export default function SummaryPage() {
       </div>
     </div>
   );
-} 
+}

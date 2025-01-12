@@ -1,25 +1,29 @@
 "use client";
 
-import { useState } from 'react';
-import { authService } from '@/lib/auth-service';
-import Link from 'next/link';
+import { useState } from "react";
+import { authService } from "@/lib/auth-service";
+import Link from "next/link";
 
 export default function ForgotPassword() {
-  const [email, setEmail] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError('');
+    setError("");
     setSuccess(false);
 
     try {
       const { error } = await authService.resetPassword(email);
-      if (error) throw error;
+      if (error) throw new Error(error.message || 'Password reset failed');
       setSuccess(true);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("An unexpected error occurred.");
+      }
     }
   };
 
@@ -60,4 +64,4 @@ export default function ForgotPassword() {
       </div>
     </div>
   );
-} 
+}

@@ -1,23 +1,12 @@
-import { Button } from "@/components/ui/button"
 import Image from 'next/image'
 import { Clock } from 'lucide-react'
+import { Button } from "@/components/ui/button"
 
 interface VideoCardProps {
   title: string
   image: string
   duration: string
 }
-
-const getYouTubeThumbnail = (videoId: string) => {
-  const thumbnails = [
-    `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`,
-    `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`,
-    `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`,
-    `https://img.youtube.com/vi/${videoId}/default.jpg`,
-  ];
-  
-  return thumbnails[1]; // Using hqdefault as it's more reliable
-};
 
 export function VideoCard({ title, image, duration }: VideoCardProps) {
   return (
@@ -42,4 +31,3 @@ export function VideoCard({ title, image, duration }: VideoCardProps) {
     </div>
   )
 }
-

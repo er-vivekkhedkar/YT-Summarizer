@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect, useState } from 'react';
-import { nhost } from '@/lib/nhost';
-import { useUserData } from '@nhost/nextjs';
-import { Button } from "@/components/ui/button";
+import { useEffect, useState } from "react";
+import { nhost } from "@/lib/nhost";
+import { useUserData } from "@nhost/nextjs";
 
 interface Summary {
   id: string;
@@ -18,7 +17,9 @@ export default function HistoryPage() {
 
   useEffect(() => {
     if (user) {
-      nhost.graphql.request(`
+      nhost.graphql
+        .request(
+          `
         query($userId: uuid!) {
           summaries(where: { user_id: { _eq: $userId } }) {
             id
@@ -27,11 +28,15 @@ export default function HistoryPage() {
             created_at
           }
         }
-      `, { userId: user.id }).then(({ data }) => {
-        setSummaries(data.summaries);
-      }).catch(error => {
-        console.error('Error fetching summaries:', error);
-      });
+      `,
+          { userId: user.id }
+        )
+        .then(({ data }) => {
+          setSummaries(data.summaries);
+        })
+        .catch((error) => {
+          console.error("Error fetching summaries:", error);
+        });
     }
   }, [user]);
 
@@ -41,10 +46,15 @@ export default function HistoryPage() {
       {summaries.length > 0 ? (
         <div className="space-y-4">
           {summaries.map((item) => (
-            <div key={item.id} className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+            <div
+              key={item.id}
+              className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow"
+            >
               <div className="flex justify-between items-start mb-4">
                 <div>
-                  <h3 className="text-xl font-semibold mb-2">Summary from {new Date(item.created_at).toLocaleDateString()}</h3>
+                  <h3 className="text-xl font-semibold mb-2">
+                    Summary from {new Date(item.created_at).toLocaleDateString()}
+                  </h3>
                   <p className="text-gray-600 dark:text-gray-300">{item.summary}</p>
                 </div>
               </div>
@@ -58,4 +68,4 @@ export default function HistoryPage() {
       )}
     </div>
   );
-} 
+}
