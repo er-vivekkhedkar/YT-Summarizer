@@ -19,80 +19,7 @@ export default function SummaryPage() {
   const videoId = searchParams.get('v');
   const user = useUserData();
 
-  const checkExistingSummary = useCallback(async (videoId: string) => {
-    if (user) {
-      try {
-        // Check if summary exists in Nhost
-        const { data } = await nhost.graphql.request(`
-          query GetSummary($videoId: String!, $userId: uuid!) {
-            summaries(where: { video_id: { _eq: $videoId }, user_id: { _eq: $userId } }) {
-              id
-              summary
-              video_title
-              created_at
-            }
-          }
-        `, {
-          videoId,
-          userId: user.id
-        });
-
-        if (data?.summaries?.[0]) {
-          setSummary(data.summaries[0].summary);
-          setVideoTitle(data.summaries[0].video_title);
-          calculateReadingTime(data.summaries[0].summary);
-          setLoading(false);
-          return;
-        }
-      } catch (error) {
-        console.error('Failed to fetch existing summary:', error);
-      }
-    }
-    
-    // If no existing summary or not logged in, fetch new one
-    fetchSummary(videoId);
-  }, [user]);
-
-  useEffect(() => {
-    if (videoId) {
-      checkExistingSummary(videoId);
-    }
-  }, [videoId, checkExistingSummary]);
-
-  const storeSummaryInNhost = async (videoId: string, summary: string, title: string) => {
-    if (!user) return;
-
-    try {
-      await nhost.graphql.request(`
-        mutation InsertSummary($videoId: String!, $userId: uuid!, $summary: String!, $title: String!) {
-          insert_summaries_one(object: {
-            video_id: $videoId,
-            user_id: $userId,
-            summary: $summary,
-            video_title: $title
-          }) {
-            id
-          }
-        }
-      `, {
-        videoId,
-        userId: user.id,
-        summary,
-        title: title || 'Untitled Video'
-      });
-    } catch (error) {
-      console.error('Failed to store summary:', error);
-    }
-  };
-
-  const calculateReadingTime = (text: string) => {
-    const wordsPerMinute = 200;
-    const words = text.split(' ').length;
-    const minutes = Math.ceil(words / wordsPerMinute);
-    setReadingTime(`${minutes} min read`);
-  };
-
-  const fetchSummary = async (videoId: string) => {
+  const fetchSummary = useCallback(async (videoId: string) => {
     try {
       setLoading(true);
       setError('');
@@ -167,6 +94,79 @@ export default function SummaryPage() {
     } finally {
       setLoading(false);
     }
+  }, [user]);
+
+  const checkExistingSummary = useCallback(async (videoId: string) => {
+    if (user) {
+      try {
+        // Check if summary exists in Nhost
+        const { data } = await nhost.graphql.request(`
+          query GetSummary($videoId: String!, $userId: uuid!) {
+            summaries(where: { video_id: { _eq: $videoId }, user_id: { _eq: $userId } }) {
+              id
+              summary
+              video_title
+              created_at
+            }
+          }
+        `, {
+          videoId,
+          userId: user.id
+        });
+
+        if (data?.summaries?.[0]) {
+          setSummary(data.summaries[0].summary);
+          setVideoTitle(data.summaries[0].video_title);
+          calculateReadingTime(data.summaries[0].summary);
+          setLoading(false);
+          return;
+        }
+      } catch (error) {
+        console.error('Failed to fetch existing summary:', error);
+      }
+    }
+    
+    // If no existing summary or not logged in, fetch new one
+    fetchSummary(videoId);
+  }, [user, fetchSummary]);
+
+  useEffect(() => {
+    if (videoId) {
+      checkExistingSummary(videoId);
+    }
+  }, [videoId, checkExistingSummary]);
+
+  const storeSummaryInNhost = async (videoId: string, summary: string, title: string) => {
+    if (!user) return;
+
+    try {
+      await nhost.graphql.request(`
+        mutation InsertSummary($videoId: String!, $userId: uuid!, $summary: String!, $title: String!) {
+          insert_summaries_one(object: {
+            video_id: $videoId,
+            user_id: $userId,
+            summary: $summary,
+            video_title: $title
+          }) {
+            id
+          }
+        }
+      `, {
+        videoId,
+        userId: user.id,
+        summary,
+        title: title || 'Untitled Video'
+      });
+    } catch (error) {
+      console.error('Failed to store summary:', error);
+    }
+  };
+
+  const calculateReadingTime = (text: string) => {
+    const wordsPerMinute = 200;
+    const words = text.split(' ').length;
+    const minutes = Math.ceil(words / wordsPerMinute);
+    setReadingTime(`${minutes} min read`);
   };
 
   const copyToClipboard = async () => {
