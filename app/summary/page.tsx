@@ -187,7 +187,7 @@ export default function SummaryPage() {
       element.click();
       document.body.removeChild(element);
       toast.success('Summary downloaded!');
-    } catch (error) {
+    } catch {
       toast.error('Failed to download summary');
     }
   };
