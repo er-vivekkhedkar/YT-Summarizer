@@ -3,15 +3,10 @@
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { 
-  Bell, 
   Moon, 
   Sun, 
-  Globe, 
-  MessageSquare, 
   Sliders, 
-  Save,
-  ToggleLeft,
-  Share2
+  Save
 } from 'lucide-react';
 
 interface SettingsSectionProps {

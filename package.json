@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build",
+    "build": "cross-env NODE_OPTIONS='--max_old_space_size=4096' next build",
     "start": "next start",
     "lint": "next lint"
   },
@@ -28,7 +28,8 @@
     "tailwind-merge": "^2.6.0",
     "tailwindcss-animate": "^1.0.7",
     "youtube-transcript": "^1.2.1",
-    "youtube-transcript-api": "^1.1.2"
+    "youtube-transcript-api": "^1.1.2",
+    "cross-env": "^7.0.3"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

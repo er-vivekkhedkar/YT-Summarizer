@@ -5,8 +5,6 @@ import { Play as PlayIcon } from 'lucide-react';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useUserData } from '@nhost/nextjs';
-import { nhost } from '@/lib/nhost';
-import { generateSummary, extractVideoTranscript } from '@/lib/summarizer';
 import Link from "next/link"
 import { ArrowRight, CheckCircle, Brain, Share2, LinkIcon, FileText, Tag, Smile, Play } from 'lucide-react'
 import Image from 'next/image'
@@ -18,13 +16,11 @@ import { toast } from 'react-hot-toast';
 export default function HomePage() {
   const [videoUrl, setVideoUrl] = useState('');
   const [loading, setLoading] = useState(false);
-  const [summary, setSummary] = useState('');
   const user = useUserData();
 
   const handleSummarize = async () => {
     if (!videoUrl) return;
     setLoading(true);
-    setSummary(''); // Reset summary before new request
     
     try {
       const videoId = extractVideoId(videoUrl);
@@ -43,7 +39,6 @@ export default function HomePage() {
     } catch (error) {
       console.error('Error:', error);
       toast.error('Failed to process video. Please try again.');
-      setSummary(''); // Clear summary on error
     } finally {
       setLoading(false);
     }

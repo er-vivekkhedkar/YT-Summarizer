@@ -19,6 +19,32 @@ export default function SummaryPage() {
   const videoId = searchParams.get('v');
   const user = useUserData();
 
+  const storeSummaryInNhost = useCallback(async (videoId: string, summary: string, title: string) => {
+    if (!user) return;
+
+    try {
+      await nhost.graphql.request(`
+        mutation InsertSummary($videoId: String!, $userId: uuid!, $summary: String!, $title: String!) {
+          insert_summaries_one(object: {
+            video_id: $videoId,
+            user_id: $userId,
+            summary: $summary,
+            video_title: $title
+          }) {
+            id
+          }
+        }
+      `, {
+        videoId,
+        userId: user.id,
+        summary,
+        title: title || 'Untitled Video'
+      });
+    } catch (error) {
+      console.error('Failed to store summary:', error);
+    }
+  }, [user]);
+
   const fetchSummary = useCallback(async (videoId: string) => {
     try {
       setLoading(true);
@@ -94,7 +120,7 @@ export default function SummaryPage() {
     } finally {
       setLoading(false);
     }
-  }, [user]);
+  }, [user, storeSummaryInNhost]);
 
   const checkExistingSummary = useCallback(async (videoId: string) => {
     if (user) {
@@ -136,32 +162,6 @@ export default function SummaryPage() {
     }
   }, [videoId, checkExistingSummary]);
 
-  const storeSummaryInNhost = async (videoId: string, summary: string, title: string) => {
-    if (!user) return;
-
-    try {
-      await nhost.graphql.request(`
-        mutation InsertSummary($videoId: String!, $userId: uuid!, $summary: String!, $title: String!) {
-          insert_summaries_one(object: {
-            video_id: $videoId,
-            user_id: $userId,
-            summary: $summary,
-            video_title: $title
-          }) {
-            id
-          }
-        }
-      `, {
-        videoId,
-        userId: user.id,
-        summary,
-        title: title || 'Untitled Video'
-      });
-    } catch (error) {
-      console.error('Failed to store summary:', error);
-    }
-  };
-
   const calculateReadingTime = (text: string) => {
     const wordsPerMinute = 200;
     const words = text.split(' ').length;
@@ -173,7 +173,7 @@ export default function SummaryPage() {
     try {
       await navigator.clipboard.writeText(summary);
       toast.success('Copied to clipboard!');
-    } catch (_) {
+    } catch {
       toast.error('Failed to copy text');
     }
   };
@@ -207,10 +207,8 @@ export default function SummaryPage() {
       } else {
         await copyToClipboard();
       }
-    } catch (error) {
-      if (error instanceof Error && error.name !== 'AbortError') {
-        toast.error('Failed to share');
-      }
+    } catch {
+      toast.error('Failed to share');
     }
   };
 

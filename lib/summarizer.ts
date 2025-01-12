@@ -48,7 +48,7 @@ export async function extractVideoTranscript(videoId: string): Promise<string> {
     }
 
     const data = await response.json();
-    return data.transcript.map((item: any) => item.text).join(' ');
+    return data.transcript.map((item: { text: string }) => item.text).join(' ');
   } catch (error) {
     console.error('Error extracting transcript:', error);
     throw new Error('Failed to extract video transcript');

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from 'react';
-import { CreditCard, Clock, CheckCircle, AlertCircle } from 'lucide-react';
+import { CreditCard, Clock, CheckCircle } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 
 const PRICING_PLANS = [
