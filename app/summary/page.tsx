@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useUserData } from '@nhost/nextjs';
 import { nhost } from '@/lib/nhost';
@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Share2, Copy, Download, Clock, Book, AlertCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 
-export default function SummaryPage() {
+function SummaryContent() {
   const [summary, setSummary] = useState('');
   const [loading, setLoading] = useState(true);
   const [readingTime, setReadingTime] = useState('');
@@ -305,5 +305,17 @@ export default function SummaryPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function SummaryPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-pulse">Loading...</div>
+      </div>
+    }>
+      <SummaryContent />
+    </Suspense>
   );
 }
