@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useUserData } from '@nhost/nextjs';
 import { nhost } from '@/lib/nhost';
@@ -19,13 +19,7 @@ export default function SummaryPage() {
   const videoId = searchParams.get('v');
   const user = useUserData();
 
-  useEffect(() => {
-    if (videoId) {
-      checkExistingSummary(videoId);
-    }
-  }, [videoId, user]);
-
-  const checkExistingSummary = async (videoId: string) => {
+  const checkExistingSummary = useCallback(async (videoId: string) => {
     if (user) {
       try {
         // Check if summary exists in Nhost
@@ -57,7 +51,13 @@ export default function SummaryPage() {
     
     // If no existing summary or not logged in, fetch new one
     fetchSummary(videoId);
-  };
+  }, [user]);
+
+  useEffect(() => {
+    if (videoId) {
+      checkExistingSummary(videoId);
+    }
+  }, [videoId, checkExistingSummary]);
 
   const storeSummaryInNhost = async (videoId: string, summary: string, title: string) => {
     if (!user) return;
@@ -173,7 +173,7 @@ export default function SummaryPage() {
     try {
       await navigator.clipboard.writeText(summary);
       toast.success('Copied to clipboard!');
-    } catch (err) {
+    } catch (_) {
       toast.error('Failed to copy text');
     }
   };
@@ -208,7 +208,7 @@ export default function SummaryPage() {
         await copyToClipboard();
       }
     } catch (error) {
-      if ((error as Error).name !== 'AbortError') {
+      if (error instanceof Error && error.name !== 'AbortError') {
         toast.error('Failed to share');
       }
     }

@@ -26,14 +26,16 @@ async function checkCaptionsAvailable(videoId: string) {
   try {
     await YoutubeTranscript.fetchTranscript(videoId, { lang: 'en' });
     return true;
-  } catch (error: any) {
-    if (error.message?.includes('Transcript is disabled')) {
-      return { error: 'CAPTIONS_DISABLED' };
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      if (error.message?.includes('Transcript is disabled')) {
+        return { error: 'CAPTIONS_DISABLED' as const };
+      }
+      if (error.message?.includes('No captions found')) {
+        return { error: 'NO_CAPTIONS' as const };
+      }
     }
-    if (error.message?.includes('No captions found')) {
-      return { error: 'NO_CAPTIONS' };
-    }
-    return { error: 'UNKNOWN_ERROR' };
+    return { error: 'UNKNOWN_ERROR' as const };
   }
 }
 
@@ -124,8 +126,6 @@ export async function POST(req: Request) {
 
   } catch (error) {
     console.error('API error:', error);
-    
-    // Provide helpful fallback response
     try {
       const completion = await openai.chat.completions.create({
         model: "anthropic/claude-2",
@@ -148,8 +148,7 @@ export async function POST(req: Request) {
         warning: 'Unable to fully analyze this video. Here are some suggestions:',
         userMessage: 'Try videos with captions enabled for better results.'
       });
-
-    } catch (fallbackError) {
+    } catch {
       return NextResponse.json(
         { 
           error: error instanceof Error ? error.message : 'Failed to process video',
