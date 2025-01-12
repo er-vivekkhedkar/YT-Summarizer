@@ -196,13 +196,14 @@ export default function SummaryPage() {
     try {
       if (navigator.share) {
         await navigator.share({
-          title: 'YouTube Video Summary',
+          title: videoTitle || 'Video Summary',
           text: summary,
           url: window.location.href,
         });
         toast.success('Shared successfully!');
       } else {
-        await copyToClipboard();
+        await navigator.clipboard.writeText(window.location.href);
+        toast.success('Link copied to clipboard!');
       }
     } catch {
       toast.error('Failed to share');
