@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+// import { useState } from 'react';
 import { CreditCard, Clock, CheckCircle } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 
@@ -45,7 +45,7 @@ const BILLING_HISTORY = [
 ];
 
 export default function BillingPage() {
-  const [selectedPlan, setSelectedPlan] = useState<string>('Free');
+//   const [selectedPlan, setSelectedPlan] = useState<string>('Free');
 
   return (
     <div className="container mx-auto px-4 py-8">
