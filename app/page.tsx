@@ -6,11 +6,9 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useUserData } from '@nhost/nextjs';
 import Link from "next/link";
-import { ArrowRight, CheckCircle, Brain, Share2, LinkIcon, FileText, Tag, Smile } from 'lucide-react';
+import { ArrowRight, CheckCircle, Brain, FileText, Tag, Smile } from 'lucide-react';
 import Image from 'next/image';
-import { VideoCard } from "@/components/video-card";
-import { FeatureCard } from "@/components/feature-card";
-import { ToolCard } from "@/components/tool-card";
+
 import { toast } from 'react-hot-toast';
 
 export default function HomePage() {
