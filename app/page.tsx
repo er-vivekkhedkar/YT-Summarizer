@@ -6,6 +6,8 @@ import Image from 'next/image'
 import { VideoCard } from "@/components/video-card"
 import { FeatureCard } from "@/components/feature-card"
 import { ToolCard } from "@/components/tool-card"
+import { toast } from 'react-hot-toast'
+import { useState } from 'react'
 
 export default function HomePage() {
   const recentVideos = [
@@ -26,6 +28,33 @@ export default function HomePage() {
     { title: "Keyword Extraction", description: "Identify key topics and themes from your videos.", icon: <Tag className="w-12 h-12 text-primary" /> },
     { title: "Sentiment Analysis", description: "Understand the emotional tone of your video content.", icon: <Smile className="w-12 h-12 text-primary" /> },
   ];
+
+  const [loading, setLoading] = useState(false)
+  const [videoUrl, setVideoUrl] = useState('')
+
+  const extractVideoId = (url: string) => {
+    const regex = /(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+    const match = url.match(regex);
+    return match ? match[1] : null;
+  };
+
+  const handleSummarize = async () => {
+    try {
+      setLoading(true)
+      const videoId = extractVideoId(videoUrl)
+      
+      if (!videoId) {
+        toast.error('Please enter a valid YouTube URL')
+        return
+      }
+
+      window.location.href = `/summary?v=${videoId}`
+    } catch (error) {
+      toast.error('Failed to process video URL')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
     <>
@@ -53,9 +82,23 @@ export default function HomePage() {
                   type="url" 
                   placeholder="Paste your YouTube video URL here..." 
                   className="flex-grow bg-white/10 border-white/20 text-white placeholder-white/50"
+                  value={videoUrl}
+                  onChange={(e) => setVideoUrl(e.target.value)}
                 />
-                <Button size="lg" className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-white bg-red-600 hover:bg-red-700">
-                  <Play className="mr-2 h-4 w-4" /> Summarize Now
+                <Button 
+                  size="lg" 
+                  className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-white bg-red-600 hover:bg-red-700"
+                  onClick={handleSummarize}
+                  disabled={loading || !videoUrl}
+                >
+                  {loading ? (
+                    <span className="animate-pulse">Processing...</span>
+                  ) : (
+                    <>
+                      <Play className="mr-2 h-4 w-4" /> 
+                      Summarize Now
+                    </>
+                  )}
                 </Button>
               </div>
             </div>
