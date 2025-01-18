@@ -46,13 +46,17 @@ export default function SummaryPage() {
       const res = await fetch('/api/summarize', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ videoId })
+        body: JSON.stringify({ videoId }),
       });
       const data = await res.json();
       if (!data.success) throw new Error(data.error);
       setSummary(data.summary);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('An unknown error occurred');
+      }
     } finally {
       setLoading(false);
     }
@@ -164,7 +168,7 @@ Conclusion:
 ${summary.content.conclusion}
 
 Video URL: ${summary.videoInfo.url}
-            `.trim();
+              `.trim();
 
               const blob = new Blob([summaryText], { type: 'text/plain' });
               const url = URL.createObjectURL(blob);
