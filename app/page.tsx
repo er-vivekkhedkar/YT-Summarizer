@@ -13,22 +13,22 @@ import { useState } from 'react'
 
 export default function HomePage() {
   const recentVideos = [
-    { title: "The Future of AI in 2023", image: "https://img.youtube.com/vi/b9GtjIw-afo/maxresdefault.jpg", duration: "10:23" },
+    { title: "The Future of AI in 2024", image: "https://img.youtube.com/vi/b9GtjIw-afo/maxresdefault.jpg", duration: "10:23" },
     { title: "How to Learn Programming: Full Beginner's Guide", image: "https://img.youtube.com/vi/eWRfhZUzrAc/maxresdefault.jpg", duration: "15:45" },
-    { title: "Understanding Blockchain in 10 Minutes", image: "https://img.youtube.com/vi/SSo_EIwHSd4/maxresdefault.jpg", duration: "9:58" },
+    { title: "Understanding Blockchain in 10 Minutes", image: "https://img.youtube.com/vi/SSo_EIwHSd4/maxresdefault.jpg", duration: "9:58"  },
     { title: "The Science of Productivity: How to Get More Done", image: "https://img.youtube.com/vi/Oo0lCZyuF6k/maxresdefault.jpg", duration: "12:34" }
   ];
 
   const features = [
     { title: "Save Time", description: "Get the key points of any video in minutes, not hours.", icon: <CheckCircle className="h-12 w-12 text-primary" /> },
     { title: "Improve Comprehension", description: "Understand complex topics with clear, concise summaries.", icon: <Brain className="h-12 w-12 text-primary" /> },
-    { title: "Boost Productivity", description: "Focus on what matters most in your video content.", icon: <ArrowRight className="h-12 w-12 text-primary" /> }
+    { title: "Boost Productivity", description: "Focus on what matters most in your video content.", icon: <ArrowRight className="h-12 w-12 text-primary " /> }
   ];
 
   const tools = [
-    { title: "Video Transcription", description: "Get accurate transcripts for your YouTube videos.", icon: <FileText className="w-12 h-12 text-primary" /> },
-    { title: "Keyword Extraction", description: "Identify key topics and themes from your videos.", icon: <Tag className="w-12 h-12 text-primary" /> },
-    { title: "Sentiment Analysis", description: "Understand the emotional tone of your video content.", icon: <Smile className="w-12 h-12 text-primary" /> },
+    { title: "Video Transcription", description: "Get accurate transcripts for your YouTube videos.", icon: <FileText className="w-12 h-12 text-primary dark:text-white" /> },
+    { title: "Keyword Extraction", description: "Identify key topics and themes from your videos.", icon: <Tag className="w-12 h-12 text-primary dark:text-white" /> },
+    { title: "Sentiment Analysis", description: "Understand the emotional tone of your video content.", icon: <Smile className="w-12 h-12 text-primary dark:text-white" /> },
   ];
 
   const [loading, setLoading] = useState(false)

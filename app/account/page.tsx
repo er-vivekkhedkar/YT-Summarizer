@@ -12,23 +12,28 @@ export default function AccountPage() {
   const [isEditingPassword, setIsEditingPassword] = useState(false);
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8">Account Settings</h1>
+    <div className="container mx-auto px-4 py-8 ">
+      <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-8">Account Settings</h1>
       
-      <div className="space-y-8">
+      <div className="space-y-8 ">
         {/* Profile Section */}
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
-          <h2 className="text-xl font-semibold mb-4 flex items-center">
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow justify-center items-center flex flex-col">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
             <User className="mr-2" /> Profile Information
           </h2>
-          <div className="flex items-center space-x-4">
-            <Avatar className="h-20 w-20">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4">
+            <Avatar className="h-20 w-20 relative">
               <AvatarImage src={user?.avatarUrl || ''} alt={user?.email || ''} />
-              <AvatarFallback>{user?.email?.charAt(0).toUpperCase()}</AvatarFallback>
+              <AvatarFallback>
+                <User className="h-8 w-8 text-gray-600" />
+              </AvatarFallback>
+              <div className="absolute bottom-0 right-0 bg-gray-800 p-2 rounded-full justify-between items-center flex">
+                <User className="text-white" />
+              </div>
             </Avatar>
-            <div>
-              <p className="text-sm text-gray-500">Profile Picture</p>
-              <Button variant="outline" className="mt-2">
+            <div className="mt-4 sm:mt-0 w-full">
+              <p className="text-md text-gray-600 dark:text-white">Profile Picture</p>
+              <Button variant="outline" className="mt-3 w-full">
                 Change Avatar
               </Button>
             </div>
@@ -37,7 +42,7 @@ export default function AccountPage() {
 
         {/* Email Section */}
         <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
-          <h2 className="text-xl font-semibold mb-4 flex items-center">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
             <Mail className="mr-2" /> Email Address
           </h2>
           {isEditingEmail ? (
@@ -55,9 +60,9 @@ export default function AccountPage() {
               </div>
             </div>
           ) : (
-            <div className="flex items-center justify-between">
-              <p>{user?.email}</p>
-              <Button variant="outline" onClick={() => setIsEditingEmail(true)}>
+            <div className="space-y-2">
+              <p className="text-gray-700 dark:text-white">{user?.email}</p>
+              <Button variant="outline" onClick={() => setIsEditingEmail(true)} className="w-full sm:w-auto">
                 Change Email
               </Button>
             </div>
@@ -66,7 +71,7 @@ export default function AccountPage() {
 
         {/* Password Section */}
         <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
-          <h2 className="text-xl font-semibold mb-4 flex items-center">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
             <Key className="mr-2" /> Password
           </h2>
           {isEditingPassword ? (
@@ -87,9 +92,7 @@ export default function AccountPage() {
                 className="w-full p-2 border rounded"
               />
               <div className="space-x-2">
-                <Button onClick={() => setIsEditingPassword(false)}>
-                  Update Password
-                </Button>
+                <Button onClick={() => setIsEditingPassword(false)}>Update Password</Button>
                 <Button variant="outline" onClick={() => setIsEditingPassword(false)}>
                   Cancel
                 </Button>
@@ -97,7 +100,7 @@ export default function AccountPage() {
             </div>
           ) : (
             <div className="flex items-center justify-between">
-              <p>••••••••</p>
+              <p className="text-gray-700 dark:text-white">••••••••</p>
               <Button variant="outline" onClick={() => setIsEditingPassword(true)}>
                 Change Password
               </Button>
@@ -109,8 +112,8 @@ export default function AccountPage() {
         <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-xl font-semibold">Current Plan</h2>
-              <p className="text-gray-500">Free Plan</p>
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Current Plan</h2>
+              <p className="text-gray-600 dark:text-white">Free Plan</p>
             </div>
             <Button variant="default" className="bg-red-600 hover:bg-red-700">
               Upgrade Plan
@@ -120,4 +123,4 @@ export default function AccountPage() {
       </div>
     </div>
   );
-} 
+}

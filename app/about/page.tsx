@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
 import { PageHeader } from "@/components/page-header"
@@ -22,15 +24,15 @@ export default function AboutPage() {
               Learn More About Our Story
             </Button>
           </div>
-          <div className="relative h-[400px] rounded-lg overflow-hidden shadow-lg">
+           {/*<div className="relative h-[400px] rounded-lg overflow-hidden shadow-lg">
             <Image
-              src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80"
+              src=""
               alt="YT Summarizer Team"
               layout="fill"
               objectFit="cover"
               className="rounded-lg"
-            />
-          </div>
+            /> 
+          </div>*/}
         </div>
         <div className="mt-16">
           <h2 className="text-3xl font-bold mb-8 text-center">Our Mission</h2>

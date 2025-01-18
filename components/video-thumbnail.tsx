@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image"
 
 interface VideoThumbnailProps {
@@ -8,7 +10,7 @@ interface VideoThumbnailProps {
 
 export function VideoThumbnail({ src, alt, title }: VideoThumbnailProps) {
   return (
-    <div className="overflow-hidden rounded-lg shadow-sm transition-all hover:shadow-md">
+    <div className="overflow-hidden rounded-lg shadow-sm transition-all hover:shadow-md dark:bg-gray-900 dark:text-white">
       <Image
         src={src}
         alt={alt}
@@ -18,7 +20,7 @@ export function VideoThumbnail({ src, alt, title }: VideoThumbnailProps) {
         className="object-cover"
       />
       <div className="p-2">
-        <h3 className="text-sm font-medium line-clamp-2">{title}</h3>
+        <h3 className="text-sm font-medium line-clamp-2 text-gray-900 dark:text-white">{title}</h3>
       </div>
     </div>
   )

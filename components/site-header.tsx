@@ -69,16 +69,16 @@ export function SiteHeader() {
   return (
     <header className={`sticky top-0 z-50 w-full transition-all duration-300 ${
       isScrolled 
-        ? 'bg-white shadow-md dark:bg-gray-900' 
-        : 'bg-white dark:bg-gray-900'
+        ? 'bg-white shadow-md dark:bg-gray-900 dark:text-white' 
+        : 'bg-white dark:bg-gray-900 dark:text-white'
     }`}>
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto px-4 ">
         <div className="flex h-16 items-center justify-between">
           <Link className="flex items-center space-x-2" href="/">
             <Youtube className="h-6 w-6 text-red-600" />
-            <span className="font-bold text-xl">YT Summarizer</span>
+            <span className="font-bold text-xl text-gray-900 dark:text-white">YT Summarizer</span>
           </Link>
-          <nav className="hidden md:flex items-center space-x-1">
+          <nav className="hidden md:flex items-center space-x-1 text-gray-900 dark:text-white">
             {navItems.map((item, index) => (
               'items' in item ? (
                 <DropdownMenu key={index}>
@@ -100,7 +100,7 @@ export function SiteHeader() {
                 <Link 
                   key={item.href} 
                   href={item.href} 
-                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors text-gray-900 dark:text-white ${
                     pathname === item.href
                       ? 'bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-100'
                       : 'hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-gray-800'
@@ -111,25 +111,26 @@ export function SiteHeader() {
               )
             ))}
           </nav>
-          <div className="hidden md:flex items-center space-x-2">
+          <div className="hidden md:flex items-center space-x-2 text-gray-900 dark:text-white">
             {mounted && (
               <>
                 {isLoading ? (
-                  <div className="h-9 w-9 rounded-full bg-gray-200 animate-pulse" />
+                  <div className="h-9 w-9 rounded-full bg-gray-200  
+                   animate-pulse dark:bg-gray-800" />
                 ) : isAuthenticated ? (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button 
                         variant="ghost" 
-                        className="relative h-9 rounded-full px-2 hover:bg-gray-100 dark:hover:bg-gray-800"
+                        className="relative h-9 rounded-full px-2 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-900 dark:text-white"
                       >
-                        <div className="flex items-center space-x-2">
-                          <Avatar className="h-7 w-7 border border-gray-200 dark:border-gray-700">
+                        <div className="flex items-center space-x-2 text-gray-900 dark:text-white">
+                          <Avatar className="h-7 w-7 border border-gray-200 dark:border-gray-700 bg-gray-900 text-white dark:bg-gray-700">
                             <AvatarImage 
                               src={user?.avatarUrl || ''} 
                               alt={user?.email || ''} 
                             />
-                            <AvatarFallback className="bg-gray-900 text-white dark:bg-gray-700">
+                            <AvatarFallback className="bg-gray-900 text-white dark:bg-gray-700 dark:text-white">
                               {getUserInitials()}
                             </AvatarFallback>
                           </Avatar>
@@ -150,7 +151,7 @@ export function SiteHeader() {
                           <p className="text-sm font-medium leading-none">
                             {user?.email}
                           </p>
-                          <p className="text-xs text-gray-500 dark:text-gray-400">
+                          <p className="text-xs text-gray-500 dark:text-white">
                             Free Plan
                           </p>
                         </div>

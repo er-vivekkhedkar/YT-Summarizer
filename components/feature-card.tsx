@@ -1,3 +1,5 @@
+"use client";
+
 import { ReactNode } from 'react'
 
 interface FeatureCardProps {
@@ -12,8 +14,8 @@ export function FeatureCard({ title, description, icon }: FeatureCardProps) {
       <div className="inline-block p-3 bg-primary/10 rounded-full mb-4">
         {icon}
       </div>
-      <h3 className="text-xl font-semibold mb-2">{title}</h3>
-      <p className="text-gray-600">{description}</p>
+      <h3 className="text-xl font-semibold mb-2 text-gray-900 dark:text-black">{title}</h3>
+      <p className="text-gray-900 dark:text-black">{description}</p>
     </div>
   )
 }
