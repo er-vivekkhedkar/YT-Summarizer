@@ -164,7 +164,7 @@ Conclusion:
 ${summary.content.conclusion}
 
 Video URL: ${summary.videoInfo.url}
-              `.trim();
+            `.trim();
 
               const blob = new Blob([summaryText], { type: 'text/plain' });
               const url = URL.createObjectURL(blob);
