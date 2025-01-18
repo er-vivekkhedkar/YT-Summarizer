@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import toast from 'react-hot-toast';
 
 export default function WorkspacePage() {
-  const [loading, setLoading] = useState(false);
+  const [loading] = useState(false);
 
   return (
     <div className="min-h-screen bg-gray-50 py-12">

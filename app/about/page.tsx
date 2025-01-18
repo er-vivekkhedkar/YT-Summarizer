@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button"
-import Image from "next/image"
+
 import { PageHeader } from "@/components/page-header"
 
 export default function AboutPage() {
