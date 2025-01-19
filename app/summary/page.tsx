@@ -2,15 +2,14 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
-import {  Download } from 'lucide-react';
+import { Download } from 'lucide-react';
 import LoadingSpinner from '@/components/LoadingSpinner';
-
 
 function LoadingSpinnerComponent() {
   return (
-   <div>
-    <LoadingSpinner />
-   </div>
+    <div>
+      <LoadingSpinner />
+    </div>
   );
 }
 
