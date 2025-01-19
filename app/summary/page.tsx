@@ -1,14 +1,16 @@
 "use client"
 
-import { useState, useEffect } from 'react';
+
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Loader2, Download } from 'lucide-react';
 
 function LoadingSpinner() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen">
-      <Loader2 className="h-12 w-12 animate-spin text-blue-600" />
-      <p className="mt-4 text-lg text-gray-600">Generating summary...</p>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-gray-50 to-white">
+      <Loader2 className="h-16 w-16 animate-spin text-blue-600" />
+      <p className="mt-6 text-xl font-medium text-gray-700">Analyzing video content...</p>
+      <p className="mt-2 text-sm text-gray-500">This may take a moment</p>
     </div>
   );
 }
@@ -28,7 +30,7 @@ interface VideoSummary {
   };
 }
 
-export default function SummaryPage() {
+function SearchParamsContent() {
   const searchParams = useSearchParams();
   const videoId = searchParams?.get('v');
   const [summary, setSummary] = useState<VideoSummary | null>(null);
@@ -232,5 +234,13 @@ function Section({ title, content, isList = false, icon, bgColor = 'bg-gray-50',
         </div>
       </div>
     </div>
+  );
+}
+
+export default function SummaryPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <SearchParamsContent />
+    </Suspense>
   );
 }
