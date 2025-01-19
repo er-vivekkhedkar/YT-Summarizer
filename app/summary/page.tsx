@@ -6,10 +6,9 @@ import { Loader2, Download } from 'lucide-react';
 
 function LoadingSpinner() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-gray-50 to-white">
-      <Loader2 className="h-16 w-16 animate-spin text-blue-600" />
-      <p className="mt-6 text-xl font-medium text-gray-700">Analyzing video content...</p>
-      <p className="mt-2 text-sm text-gray-500">This may take a moment</p>
+    <div className="flex flex-col items-center justify-center min-h-screen">
+      <Loader2 className="h-12 w-12 animate-spin text-blue-600" />
+      <p className="mt-4 text-lg text-gray-600">Generating summary...</p>
     </div>
   );
 }
