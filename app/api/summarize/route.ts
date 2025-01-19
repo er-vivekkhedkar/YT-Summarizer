@@ -10,16 +10,11 @@ export async function POST(req: Request) {
       throw new Error('Please provide a valid YouTube video ID');
     }
 
-    // Validate video ID and get video details
+    // Validate video ID and fetch video details
     const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
     const videoInfo = await ytdl.getBasicInfo(videoUrl);
 
-    const {
-      title,
-      description,
-      author,
-      viewCount,
-    } = videoInfo.videoDetails;
+    const { title, description, author, viewCount } = videoInfo.videoDetails;
 
     // Fetch transcript
     let transcriptText = '';
@@ -27,24 +22,24 @@ export async function POST(req: Request) {
       const transcript = await YoutubeTranscript.fetchTranscript(videoId);
       transcriptText = transcript.map(item => item.text).join(' ');
     } catch (error) {
-      console.log('Transcript fetch failed. Using description as fallback:', error);
+      console.warn('Transcript fetch failed. Using description as fallback:', error);
       transcriptText = description || 'Transcript unavailable.';
     }
 
-    // Generate summary
-    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    // Generate summary using OpenAI API
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-        'HTTP-Referer': process.env.VERCEL_URL || 'http://localhost:3000'
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`, // Ensure the API key is valid
       },
       body: JSON.stringify({
         model: 'gpt-3.5-turbo',
-        messages: [{
-          role: 'user',
-          content: `Create a concise summary of this YouTube video:
-          
+        messages: [
+          {
+            role: 'user',
+            content: `Create a concise summary of this YouTube video:
+
 Title: ${title}
 Channel: ${author.name}
 Content: ${transcriptText}
@@ -59,12 +54,16 @@ Key Takeaways:
 - (takeaway 1)
 - (takeaway 2)
 - (takeaway 3)
-Conclusion: (1-2 sentences)`
-        }]
-      })
+Conclusion: (1-2 sentences)`,
+          },
+        ],
+      }),
     });
 
     if (!response.ok) {
+      if (response.status === 410) {
+        throw new Error('The requested resource is no longer available. Please try updating the API endpoint or contact support.');
+      }
       throw new Error(`Failed to generate summary. Status code: ${response.status}`);
     }
 
@@ -79,19 +78,19 @@ Conclusion: (1-2 sentences)`
           title,
           author: author.name,
           views: viewCount,
-          url: videoUrl
+          url: videoUrl,
         },
         content: {
           overview: extractSection(summaryText, 'Overview'),
           mainPoints: extractBulletPoints(summaryText, 'Main Points', 'Key Takeaways'),
           keyTakeaways: extractBulletPoints(summaryText, 'Key Takeaways', 'Conclusion'),
-          conclusion: extractSection(summaryText, 'Conclusion')
-        }
-      }
+          conclusion: extractSection(summaryText, 'Conclusion'),
+        },
+      },
     });
   } catch (error: unknown) {
     if (error instanceof Error) {
-      console.error('Summarization error:', error);
+      console.error('Summarization error:', error.message);
       return NextResponse.json(
         { success: false, error: error.message },
         { status: 500 }
@@ -114,7 +113,6 @@ function extractSection(text: string, section: string): string {
 function extractBulletPoints(text: string, startSection: string, endSection: string): string[] {
   const regex = new RegExp(`${startSection}:([^]*?)(?=${endSection}:|$)`, 'i');
   const section = text.match(regex)?.[1] || '';
-  
   return section
     .split('\n')
     .map(line => line.trim())
