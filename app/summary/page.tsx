@@ -1,16 +1,16 @@
-"use client";
+"use client"
 
-import React, { Suspense, useState, useEffect } from "react";
-import { useSearchParams } from "next/navigation";
-import { Loader2, Download } from "lucide-react";
+export const dynamic = 'force-dynamic';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { Loader2, Download } from 'lucide-react';
 
-export const dynamic = "force-dynamic";
-
-function LoadingFallback() {
+function LoadingSpinner() {
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-gray-50 to-white">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-gray-50 to-white">
       <Loader2 className="h-16 w-16 animate-spin text-blue-600" />
-      <p className="mt-6 text-xl font-medium text-gray-700">Loading...</p>
+      <p className="mt-6 text-xl font-medium text-gray-700">Analyzing video content...</p>
+      <p className="mt-2 text-sm text-gray-500">This may take a moment</p>
     </div>
   );
 }
@@ -30,12 +30,12 @@ interface VideoSummary {
   };
 }
 
-function SummaryPageContent() {
+export default function SummaryPage() {
   const searchParams = useSearchParams();
-  const videoId = searchParams?.get("v");
+  const videoId = searchParams?.get('v');
   const [summary, setSummary] = useState<VideoSummary | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
 
   useEffect(() => {
     if (videoId) fetchSummary(videoId);
@@ -44,9 +44,9 @@ function SummaryPageContent() {
   const fetchSummary = async (videoId: string) => {
     try {
       setLoading(true);
-      const res = await fetch("/api/summarize", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const res = await fetch('/api/summarize', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ videoId }),
       });
       const data = await res.json();
@@ -56,7 +56,7 @@ function SummaryPageContent() {
       if (err instanceof Error) {
         setError(err.message);
       } else {
-        setError("An unknown error occurred");
+        setError('An unknown error occurred');
       }
     } finally {
       setLoading(false);
@@ -74,7 +74,7 @@ function SummaryPageContent() {
     );
   }
 
-  if (loading) return <LoadingFallback />;
+  if (loading) return <LoadingSpinner />;
 
   if (error) {
     return (
@@ -160,10 +160,10 @@ Overview:
 ${summary.content.overview}
 
 Main Points:
-${summary.content.mainPoints.map((point, index) => `${index + 1}. ${point}`).join("\n")}
+${summary.content.mainPoints.map((point, index) => `${index + 1}. ${point}`).join('\n')}
 
 Key Takeaways:
-${summary.content.keyTakeaways.map((point, index) => `${index + 1}. ${point}`).join("\n")}
+${summary.content.keyTakeaways.map((point, index) => `${index + 1}. ${point}`).join('\n')}
 
 Conclusion:
 ${summary.content.conclusion}
@@ -171,9 +171,9 @@ ${summary.content.conclusion}
 Video URL: ${summary.videoInfo.url}
               `.trim();
 
-              const blob = new Blob([summaryText], { type: "text/plain" });
+              const blob = new Blob([summaryText], { type: 'text/plain' });
               const url = URL.createObjectURL(blob);
-              const a = document.createElement("a");
+              const a = document.createElement('a');
               a.href = url;
               a.download = `${summary.videoInfo.title.slice(0, 30)}-summary.txt`;
               document.body.appendChild(a);
@@ -201,7 +201,7 @@ interface SectionProps {
   iconBg?: string;
 }
 
-function Section({ title, content, isList = false, icon, bgColor = "bg-gray-50", iconBg = "bg-gray-100" }: SectionProps) {
+function Section({ title, content, isList = false, icon, bgColor = 'bg-gray-50', iconBg = 'bg-gray-100' }: SectionProps) {
   if (!content || (Array.isArray(content) && content.length === 0)) return null;
 
   return (
@@ -234,13 +234,5 @@ function Section({ title, content, isList = false, icon, bgColor = "bg-gray-50",
         </div>
       </div>
     </div>
-  );
-}
-
-export default function SummaryPage() {
-  return (
-    <Suspense fallback={<LoadingFallback />}>
-      <SummaryPageContent />
-    </Suspense>
   );
 }
