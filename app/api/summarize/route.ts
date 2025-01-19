@@ -27,7 +27,7 @@ export async function POST(req: Request) {
       const transcript = await YoutubeTranscript.fetchTranscript(videoId);
       transcriptText = transcript.map(item => item.text).join(' ');
     } catch (error) {
-      console.log('Using description as fallback');
+      console.log('Using description as fallback',error);
       transcriptText = description || '';
     }
 
