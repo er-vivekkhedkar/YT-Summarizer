@@ -1,16 +1,16 @@
-"use client"; // Ensure this is at the top for client-side rendering
+"use client"
 
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { Loader2, Download } from 'lucide-react';
+import {  Download } from 'lucide-react';
+import LoadingSpinner from '@/components/LoadingSpinner';
 
-function LoadingSpinner() {
+
+function LoadingSpinnerComponent() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-gray-50 to-white">
-      <Loader2 className="h-16 w-16 animate-spin text-blue-600" />
-      <p className="mt-6 text-xl font-medium text-gray-700">Analyzing video content...</p>
-      <p className="mt-2 text-sm text-gray-500">This may take a moment</p>
-    </div>
+   <div>
+    <LoadingSpinner />
+   </div>
   );
 }
 
@@ -29,9 +29,9 @@ interface VideoSummary {
   };
 }
 
-export default function SummaryPage() {
+const SearchParamsContent = () => {
   const searchParams = useSearchParams();
-  const videoId = searchParams?.get('v');
+  const videoId = searchParams.get('v');
   const [summary, setSummary] = useState<VideoSummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -73,7 +73,7 @@ export default function SummaryPage() {
     );
   }
 
-  if (loading) return <LoadingSpinner />;
+  if (loading) return <LoadingSpinnerComponent />;
 
   if (error) {
     return (
@@ -89,70 +89,69 @@ export default function SummaryPage() {
   if (!summary) return null;
 
   return (
-    <Suspense fallback={<LoadingSpinner />}>
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-        <div className="container mx-auto px-4 py-12">
-          <div className="max-w-5xl mx-auto">
-            {/* Video Section */}
-            <div className="bg-white rounded-2xl shadow-xl overflow-hidden mb-8">
-              <div className="aspect-video">
-                <iframe
-                  className="w-full h-full"
-                  src={`https://www.youtube.com/embed/${videoId}`}
-                  allowFullScreen
-                />
-              </div>
-              <div className="p-6">
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                  {summary.videoInfo.title}
-                </h1>
-                <p className="text-lg text-gray-600">
-                  Created by {summary.videoInfo.author}
-                </p>
-              </div>
-            </div>
-
-            {/* Summary Content */}
-            <div className="grid gap-8 mb-8">
-              <Section
-                title="Overview"
-                content={summary.content.overview}
-                icon="📝"
-                bgColor="bg-blue-50"
-                iconBg="bg-blue-100"
-              />
-              
-              <Section
-                title="Main Points"
-                content={summary.content.mainPoints}
-                icon="🎯"
-                isList
-                bgColor="bg-purple-50"
-                iconBg="bg-purple-100"
-              />
-              
-              <Section
-                title="Key Takeaways"
-                content={summary.content.keyTakeaways}
-                icon="💡"
-                isList
-                bgColor="bg-amber-50"
-                iconBg="bg-amber-100"
-              />
-              
-              <Section
-                title="Conclusion"
-                content={summary.content.conclusion}
-                icon="🎬"
-                bgColor="bg-green-50"
-                iconBg="bg-green-100"
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+      <div className="container mx-auto px-4 py-12">
+        <div className="max-w-5xl mx-auto">
+          {/* Video Section */}
+          <div className="bg-white rounded-2xl shadow-xl overflow-hidden mb-8">
+            <div className="aspect-video">
+              <iframe
+                className="w-full h-full"
+                src={`https://www.youtube.com/embed/${videoId}`}
+                allowFullScreen
               />
             </div>
+            <div className="p-6">
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                {summary.videoInfo.title}
+              </h1>
+              <p className="text-lg text-gray-600">
+                Created by {summary.videoInfo.author}
+              </p>
+            </div>
+          </div>
 
-            {/* Download Button */}
-            <button
-              onClick={() => {
-                const summaryText = `
+          {/* Summary Content */}
+          <div className="grid gap-8 mb-8">
+            <Section
+              title="Overview"
+              content={summary.content.overview}
+              icon="📝"
+              bgColor="bg-blue-50"
+              iconBg="bg-blue-100"
+            />
+            
+            <Section
+              title="Main Points"
+              content={summary.content.mainPoints}
+              icon="🎯"
+              isList
+              bgColor="bg-purple-50"
+              iconBg="bg-purple-100"
+            />
+            
+            <Section
+              title="Key Takeaways"
+              content={summary.content.keyTakeaways}
+              icon="💡"
+              isList
+              bgColor="bg-amber-50"
+              iconBg="bg-amber-100"
+            />
+            
+            <Section
+              title="Conclusion"
+              content={summary.content.conclusion}
+              icon="🎬"
+              bgColor="bg-green-50"
+              iconBg="bg-green-100"
+            />
+          </div>
+
+          {/* Download Button */}
+          <button
+            onClick={() => {
+              const summaryText = `
 ${summary.videoInfo.title}
 By: ${summary.videoInfo.author}
 
@@ -169,29 +168,36 @@ Conclusion:
 ${summary.content.conclusion}
 
 Video URL: ${summary.videoInfo.url}
-                `.trim();
+              `.trim();
 
-                const blob = new Blob([summaryText], { type: 'text/plain' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `${summary.videoInfo.title.slice(0, 30)}-summary.txt`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-              }}
-              className="w-full py-4 bg-red-600 hover:bg-red-700 text-white rounded-xl shadow-lg flex items-center justify-center gap-2 transition-colors duration-200"
-            >
-              <Download className="w-5 h-5" />
-              <span className="font-medium">Download Summary</span>
-            </button>
-          </div>
+              const blob = new Blob([summaryText], { type: 'text/plain' });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = `${summary.videoInfo.title.slice(0, 30)}-summary.txt`;
+              document.body.appendChild(a);
+              a.click();
+              document.body.removeChild(a);
+              URL.revokeObjectURL(url);
+            }}
+            className="w-full py-4 bg-red-600 hover:bg-red-700 text-white rounded-xl shadow-lg flex items-center justify-center gap-2 transition-colors duration-200"
+          >
+            <Download className="w-5 h-5" />
+            <span className="font-medium">Download Summary</span>
+          </button>
         </div>
       </div>
+    </div>
+  );
+};
+
+const SearchParamsWrapper = () => {
+  return (
+    <Suspense fallback={<LoadingSpinnerComponent />}>
+      <SearchParamsContent />
     </Suspense>
   );
-}
+};
 
 interface SectionProps {
   title: string;
@@ -234,6 +240,14 @@ function Section({ title, content, isList = false, icon, bgColor = 'bg-gray-50',
           )}
         </div>
       </div>
+    </div>
+  );
+}
+
+export default function Page() {
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+      <SearchParamsWrapper />
     </div>
   );
 }
