@@ -1,6 +1,5 @@
 "use client"
 
-
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Loader2, Download } from 'lucide-react';
@@ -30,12 +29,12 @@ interface VideoSummary {
   };
 }
 
-function SearchParamsContent() {
-  const searchParams = useSearchParams();
-  const videoId = searchParams?.get('v');
+function ClientContent() {
   const [summary, setSummary] = useState<VideoSummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const searchParams = useSearchParams();
+  const videoId = searchParams?.get('v');
 
   useEffect(() => {
     if (videoId) fetchSummary(videoId);
@@ -239,10 +238,17 @@ function Section({ title, content, isList = false, icon, bgColor = 'bg-gray-50',
 
 export default function Page() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <Suspense fallback={<LoadingSpinner />}>
-        <SearchParamsContent />
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+      <Suspense 
+        fallback={
+          <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-gray-50 to-white">
+            <Loader2 className="h-16 w-16 animate-spin text-blue-600" />
+            <p className="mt-6 text-xl font-medium text-gray-700">Loading...</p>
+          </div>
+        }
+      >
+        <ClientContent />
       </Suspense>
-    </main>
+    </div>
   );
 }
