@@ -29,15 +29,33 @@ interface VideoSummary {
   };
 }
 
-function ClientContent() {
+// Separate the search params logic into its own component
+function SearchParamsWrapper() {
+  const searchParams = useSearchParams();
+  const videoId = searchParams?.get('v');
+  
+  if (!videoId) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-gray-50 to-white">
+        <div className="text-center">
+          <p className="text-xl font-medium text-red-500">No video ID provided</p>
+          <p className="mt-2 text-gray-600">Please provide a valid YouTube video URL</p>
+        </div>
+      </div>
+    );
+  }
+
+  return <MainContent videoId={videoId} />;
+}
+
+// Main content component that doesn't directly use useSearchParams
+function MainContent({ videoId }: { videoId: string }) {
   const [summary, setSummary] = useState<VideoSummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const searchParams = useSearchParams();
-  const videoId = searchParams?.get('v');
 
   useEffect(() => {
-    if (videoId) fetchSummary(videoId);
+    fetchSummary(videoId);
   }, [videoId]);
 
   const fetchSummary = async (videoId: string) => {
@@ -61,17 +79,6 @@ function ClientContent() {
       setLoading(false);
     }
   };
-
-  if (!videoId) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-gray-50 to-white">
-        <div className="text-center">
-          <p className="text-xl font-medium text-red-500">No video ID provided</p>
-          <p className="mt-2 text-gray-600">Please provide a valid YouTube video URL</p>
-        </div>
-      </div>
-    );
-  }
 
   if (loading) return <LoadingSpinner />;
 
@@ -236,6 +243,7 @@ function Section({ title, content, isList = false, icon, bgColor = 'bg-gray-50',
   );
 }
 
+// Main page component
 export default function Page() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
@@ -243,11 +251,12 @@ export default function Page() {
         fallback={
           <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-gray-50 to-white">
             <Loader2 className="h-16 w-16 animate-spin text-blue-600" />
-            <p className="mt-6 text-xl font-medium text-gray-700">Loading...</p>
+            <p className="mt-6 text-xl font-medium text-gray-700">Analyzing video content...</p>
+            <p className="mt-2 text-sm text-gray-500">This may take a moment</p>
           </div>
         }
       >
-        <ClientContent />
+        <SearchParamsWrapper />
       </Suspense>
     </div>
   );
