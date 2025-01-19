@@ -29,7 +29,7 @@ export async function POST(req: Request) {
     }
 
     // 3. Generate summary using OpenAI API
-    const apiEndpoint = 'https://api.openai.com/v1/chat/completions'; // Updated endpoint
+    const apiEndpoint = 'https://openrouter.ai/api/v1'; // Updated endpoint
     const response = await fetch(apiEndpoint, {
       method: 'POST',
       headers: {
