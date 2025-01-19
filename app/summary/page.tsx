@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Loader2, Download } from 'lucide-react';
 
@@ -29,14 +29,6 @@ interface VideoSummary {
 }
 
 export default function SummaryPage() {
-  return (
-    <Suspense fallback={<LoadingSpinner />}>
-      <SummaryContent />
-    </Suspense>
-  );
-}
-
-function SummaryContent() {
   const searchParams = useSearchParams();
   const videoId = searchParams?.get('v');
   const [summary, setSummary] = useState<VideoSummary | null>(null);
