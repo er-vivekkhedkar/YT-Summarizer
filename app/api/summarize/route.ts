@@ -1,5 +1,3 @@
-"use server";
-
 import { NextResponse } from 'next/server';
 import { YoutubeTranscript } from 'youtube-transcript';
 import ytdl from 'ytdl-core';
@@ -12,10 +10,10 @@ export async function POST(req: Request) {
       throw new Error('Please provide a valid YouTube video ID');
     }
 
-    // 1. Validate video ID and get info
+    // Validate video ID and get video details
     const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
     const videoInfo = await ytdl.getBasicInfo(videoUrl);
-    
+
     const {
       title,
       description,
@@ -23,27 +21,26 @@ export async function POST(req: Request) {
       viewCount,
     } = videoInfo.videoDetails;
 
-    // 2. Get transcript
+    // Fetch transcript
     let transcriptText = '';
     try {
       const transcript = await YoutubeTranscript.fetchTranscript(videoId);
       transcriptText = transcript.map(item => item.text).join(' ');
     } catch (error) {
-      console.log('Using description as fallback',error);
-      transcriptText = description || '';
+      console.log('Transcript fetch failed. Using description as fallback:', error);
+      transcriptText = description || 'Transcript unavailable.';
     }
 
-    // 3. Generate summary
+    // Generate summary
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-        // 'HTTP-Referer': 'http://localhost:3000'
-        'HTTP-Referer': 'https://youtubesummarizer.vercel.app/'
+        'HTTP-Referer': process.env.VERCEL_URL || 'http://localhost:3000'
       },
       body: JSON.stringify({
-        model: 'mistralai/mistral-7b-instruct',
+        model: 'gpt-3.5-turbo',
         messages: [{
           role: 'user',
           content: `Create a concise summary of this YouTube video:
@@ -68,13 +65,13 @@ Conclusion: (1-2 sentences)`
     });
 
     if (!response.ok) {
-      throw new Error('Failed to generate summary');
+      throw new Error(`Failed to generate summary. Status code: ${response.status}`);
     }
 
     const data = await response.json();
     const summaryText = data.choices[0].message.content;
 
-    // 4. Parse and structure the summary
+    // Parse and structure the summary
     return NextResponse.json({
       success: true,
       summary: {
@@ -92,15 +89,13 @@ Conclusion: (1-2 sentences)`
         }
       }
     });
-
-  } 
-  catch (error: unknown) {
+  } catch (error: unknown) {
     if (error instanceof Error) {
-        console.error('Summarization error:', error);
-        return NextResponse.json(
-          { success: false, error: error.message },
-          { status: 500 }
-        );
+      console.error('Summarization error:', error);
+      return NextResponse.json(
+        { success: false, error: error.message },
+        { status: 500 }
+      );
     }
 
     console.error('Unexpected error:', error);
@@ -108,8 +103,7 @@ Conclusion: (1-2 sentences)`
       { success: false, error: 'An unexpected error occurred' },
       { status: 500 }
     );
-}
-
+  }
 }
 
 function extractSection(text: string, section: string): string {
