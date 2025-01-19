@@ -39,7 +39,8 @@ export async function POST(req: Request) {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-        'HTTP-Referer': 'http://localhost:3000'
+        // 'HTTP-Referer': 'http://localhost:3000'
+        'HTTP-Referer': 'https://youtubesummarizer.vercel.app/'
       },
       body: JSON.stringify({
         model: 'mistralai/mistral-7b-instruct',
