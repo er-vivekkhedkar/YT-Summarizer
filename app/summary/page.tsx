@@ -237,10 +237,12 @@ function Section({ title, content, isList = false, icon, bgColor = 'bg-gray-50',
   );
 }
 
-export default function SummaryPage() {
+export default function Page() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <SearchParamsContent />
-    </Suspense>
+    <main className="flex min-h-screen flex-col items-center justify-between p-24">
+      <Suspense fallback={<LoadingSpinner />}>
+        <SearchParamsContent />
+      </Suspense>
+    </main>
   );
 }
