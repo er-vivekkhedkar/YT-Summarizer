@@ -1,8 +1,7 @@
-"use server";
-
 import { NextResponse } from 'next/server';
 import { YoutubeTranscript } from 'youtube-transcript';
 import ytdl from 'ytdl-core';
+import fetch from 'node-fetch'; // Use fetch if you're running in a Node environment
 
 export async function POST(req: Request) {
   try {
@@ -15,7 +14,7 @@ export async function POST(req: Request) {
     // 1. Validate video ID and get info
     const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
     const videoInfo = await ytdl.getBasicInfo(videoUrl);
-    
+
     const {
       title,
       description,
@@ -33,21 +32,20 @@ export async function POST(req: Request) {
       transcriptText = description || '';
     }
 
-    // 3. Generate summary
-    if (!process.env.OPENAI_API_KEY) {
+    // 3. Generate summary via OpenRouter AI API
+    const apiKey = process.env.OPENAI_API_KEY;
+
+    if (!apiKey) {
       console.warn('Missing API Key');
-      return NextResponse.json(
-        { success: false, error: 'API key not set' },
-        { status: 500 }
-      );
+      return NextResponse.json({ success: false, error: 'API key not set' }, { status: 500 });
     }
 
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-        'HTTP-Referer': 'https://youtubesummarizer.vercel.app/' // Adjust the domain if necessary
+        'Authorization': `Bearer ${apiKey}`,
+        'HTTP-Referer': 'https://youtubesummarizer.vercel.app/', // Adjust referer if necessary
       },
       body: JSON.stringify({
         model: 'mistralai/mistral-7b-instruct',
@@ -71,7 +69,7 @@ Key Takeaways:
 - (takeaway 3)
 Conclusion: (1-2 sentences)`
         }]
-      })
+      }),
     });
 
     if (!response.ok) {
@@ -125,7 +123,7 @@ function extractSection(text: string, section: string): string {
 function extractBulletPoints(text: string, startSection: string, endSection: string): string[] {
   const regex = new RegExp(`${startSection}:([^]*?)(?=${endSection}:|$)`, 'i');
   const section = text.match(regex)?.[1] || '';
-  
+
   return section
     .split('\n')
     .map(line => line.trim())
