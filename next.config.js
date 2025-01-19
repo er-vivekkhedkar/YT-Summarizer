@@ -3,10 +3,21 @@ const nextConfig = {
   // ... existing config ...
   experimental: {
     // Remove serverActions
+    turbo: {
+      rules: {
+        // Your Turbopack configuration here if needed
+      },
+    },
   },
   // Remove optimizeCss since it's causing issues with critters
   images: {
-    domains: ['your-domain.com'], // Add your image domains if needed
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'img.youtube.com',
+        pathname: '/vi/**',
+      },
+    ],
   },
   // Add proper error handling through custom webpack config
   webpack: (config, { isServer }) => {
