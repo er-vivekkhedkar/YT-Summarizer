@@ -1,4 +1,4 @@
-"use client"; // Add this to enable client-side rendering
+"use client"; // Enable client-side rendering
 
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
