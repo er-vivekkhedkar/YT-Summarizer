@@ -15,8 +15,13 @@ export async function POST(req: Request) {
     // 1. Validate video ID and get info
     const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
     const videoInfo = await ytdl.getBasicInfo(videoUrl);
-
-    const { title, description, author, viewCount } = videoInfo.videoDetails;
+    
+    const {
+      title,
+      description,
+      author,
+      viewCount,
+    } = videoInfo.videoDetails;
 
     // 2. Get transcript
     let transcriptText = '';
@@ -24,24 +29,31 @@ export async function POST(req: Request) {
       const transcript = await YoutubeTranscript.fetchTranscript(videoId);
       transcriptText = transcript.map(item => item.text).join(' ');
     } catch (error) {
-      console.log('Using description as fallback:', error);
-      transcriptText = description || 'Transcript unavailable.';
+      console.log('Using description as fallback', error);
+      transcriptText = description || '';
     }
 
-    // 3. Generate summary using OpenAI API
-    const apiEndpoint = 'https://openrouter.ai/api/v1'; // Updated endpoint
-    const response = await fetch(apiEndpoint, {
+    // 3. Generate summary
+    if (!process.env.OPENAI_API_KEY) {
+      console.warn('Missing API Key');
+      return NextResponse.json(
+        { success: false, error: 'API key not set' },
+        { status: 500 }
+      );
+    }
+
+    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`, // Ensure your API key is valid
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+        'HTTP-Referer': 'https://youtubesummarizer.vercel.app/' // Adjust the domain if necessary
       },
       body: JSON.stringify({
-        model: 'gpt-3.5-turbo', // Use a supported model
-        messages: [
-          {
-            role: 'user',
-            content: `Create a concise summary of this YouTube video:
+        model: 'mistralai/mistral-7b-instruct',
+        messages: [{
+          role: 'user',
+          content: `Create a concise summary of this YouTube video:
           
 Title: ${title}
 Channel: ${author.name}
@@ -57,20 +69,13 @@ Key Takeaways:
 - (takeaway 1)
 - (takeaway 2)
 - (takeaway 3)
-Conclusion: (1-2 sentences)`,
-          },
-        ],
-      }),
+Conclusion: (1-2 sentences)`
+        }]
+      })
     });
 
     if (!response.ok) {
-      // Handle specific errors like 410
-      if (response.status === 410) {
-        throw new Error(
-          'The requested resource is no longer available. Please update the API endpoint or model being used.'
-        );
-      }
-      throw new Error(`Failed to generate summary. Status code: ${response.status}`);
+      throw new Error('Failed to generate summary');
     }
 
     const data = await response.json();
@@ -84,19 +89,20 @@ Conclusion: (1-2 sentences)`,
           title,
           author: author.name,
           views: viewCount,
-          url: videoUrl,
+          url: videoUrl
         },
         content: {
           overview: extractSection(summaryText, 'Overview'),
           mainPoints: extractBulletPoints(summaryText, 'Main Points', 'Key Takeaways'),
           keyTakeaways: extractBulletPoints(summaryText, 'Key Takeaways', 'Conclusion'),
-          conclusion: extractSection(summaryText, 'Conclusion'),
-        },
-      },
+          conclusion: extractSection(summaryText, 'Conclusion')
+        }
+      }
     });
+
   } catch (error: unknown) {
     if (error instanceof Error) {
-      console.error('Summarization error:', error.message);
+      console.error('Summarization error:', error);
       return NextResponse.json(
         { success: false, error: error.message },
         { status: 500 }
@@ -119,6 +125,7 @@ function extractSection(text: string, section: string): string {
 function extractBulletPoints(text: string, startSection: string, endSection: string): string[] {
   const regex = new RegExp(`${startSection}:([^]*?)(?=${endSection}:|$)`, 'i');
   const section = text.match(regex)?.[1] || '';
+  
   return section
     .split('\n')
     .map(line => line.trim())
