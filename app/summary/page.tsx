@@ -31,6 +31,15 @@ interface VideoSummary {
 
 // Separate the search params logic into its own component
 function SearchParamsWrapper() {
+  return (
+    <Suspense fallback={<LoadingSpinner />}>
+      <SearchParamsContent />
+    </Suspense>
+  );
+}
+
+// New component that uses useSearchParams
+function SearchParamsContent() {
   const searchParams = useSearchParams();
   const videoId = searchParams?.get('v');
   
@@ -247,17 +256,7 @@ function Section({ title, content, isList = false, icon, bgColor = 'bg-gray-50',
 export default function Page() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-      <Suspense 
-        fallback={
-          <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-gray-50 to-white">
-            <Loader2 className="h-16 w-16 animate-spin text-blue-600" />
-            <p className="mt-6 text-xl font-medium text-gray-700">Analyzing video content...</p>
-            <p className="mt-2 text-sm text-gray-500">This may take a moment</p>
-          </div>
-        }
-      >
-        <SearchParamsWrapper />
-      </Suspense>
+      <SearchParamsWrapper />
     </div>
   );
 }
