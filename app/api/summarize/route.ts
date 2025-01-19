@@ -90,13 +90,23 @@ Conclusion: (1-2 sentences)`
       }
     });
 
-  } catch (error: any) {
-    console.error('Summarization error:', error);
+  } 
+  catch (error: unknown) {
+    if (error instanceof Error) {
+        console.error('Summarization error:', error);
+        return NextResponse.json(
+          { success: false, error: error.message },
+          { status: 500 }
+        );
+    }
+
+    console.error('Unexpected error:', error);
     return NextResponse.json(
-      { success: false, error: error.message },
+      { success: false, error: 'An unexpected error occurred' },
       { status: 500 }
     );
-  }
+}
+
 }
 
 function extractSection(text: string, section: string): string {
