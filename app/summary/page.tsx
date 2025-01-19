@@ -1,7 +1,6 @@
 'use client';
 
-export const dynamic = 'force-dynamic';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Loader2, Download } from 'lucide-react';
 
@@ -90,69 +89,70 @@ export default function SummaryPage() {
   if (!summary) return null;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-      <div className="container mx-auto px-4 py-12">
-        <div className="max-w-5xl mx-auto">
-          {/* Video Section */}
-          <div className="bg-white rounded-2xl shadow-xl overflow-hidden mb-8">
-            <div className="aspect-video">
-              <iframe
-                className="w-full h-full"
-                src={`https://www.youtube.com/embed/${videoId}`}
-                allowFullScreen
+    <Suspense fallback={<LoadingSpinner />}>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+        <div className="container mx-auto px-4 py-12">
+          <div className="max-w-5xl mx-auto">
+            {/* Video Section */}
+            <div className="bg-white rounded-2xl shadow-xl overflow-hidden mb-8">
+              <div className="aspect-video">
+                <iframe
+                  className="w-full h-full"
+                  src={`https://www.youtube.com/embed/${videoId}`}
+                  allowFullScreen
+                />
+              </div>
+              <div className="p-6">
+                <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                  {summary.videoInfo.title}
+                </h1>
+                <p className="text-lg text-gray-600">
+                  Created by {summary.videoInfo.author}
+                </p>
+              </div>
+            </div>
+
+            {/* Summary Content */}
+            <div className="grid gap-8 mb-8">
+              <Section
+                title="Overview"
+                content={summary.content.overview}
+                icon="📝"
+                bgColor="bg-blue-50"
+                iconBg="bg-blue-100"
+              />
+
+              <Section
+                title="Main Points"
+                content={summary.content.mainPoints}
+                icon="🎯"
+                isList
+                bgColor="bg-purple-50"
+                iconBg="bg-purple-100"
+              />
+
+              <Section
+                title="Key Takeaways"
+                content={summary.content.keyTakeaways}
+                icon="💡"
+                isList
+                bgColor="bg-amber-50"
+                iconBg="bg-amber-100"
+              />
+
+              <Section
+                title="Conclusion"
+                content={summary.content.conclusion}
+                icon="🎬"
+                bgColor="bg-green-50"
+                iconBg="bg-green-100"
               />
             </div>
-            <div className="p-6">
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                {summary.videoInfo.title}
-              </h1>
-              <p className="text-lg text-gray-600">
-                Created by {summary.videoInfo.author}
-              </p>
-            </div>
-          </div>
 
-          {/* Summary Content */}
-          <div className="grid gap-8 mb-8">
-            <Section
-              title="Overview"
-              content={summary.content.overview}
-              icon="📝"
-              bgColor="bg-blue-50"
-              iconBg="bg-blue-100"
-            />
-            
-            <Section
-              title="Main Points"
-              content={summary.content.mainPoints}
-              icon="🎯"
-              isList
-              bgColor="bg-purple-50"
-              iconBg="bg-purple-100"
-            />
-            
-            <Section
-              title="Key Takeaways"
-              content={summary.content.keyTakeaways}
-              icon="💡"
-              isList
-              bgColor="bg-amber-50"
-              iconBg="bg-amber-100"
-            />
-            
-            <Section
-              title="Conclusion"
-              content={summary.content.conclusion}
-              icon="🎬"
-              bgColor="bg-green-50"
-              iconBg="bg-green-100"
-            />
-          </div>
-
-          {/* Download Button */}
-          <button
-            onClick={() => {
-              const summaryText = `
+            {/* Download Button */}
+            <button
+              onClick={() => {
+                const summaryText = `
 ${summary.videoInfo.title}
 By: ${summary.videoInfo.author}
 
@@ -169,26 +169,27 @@ Conclusion:
 ${summary.content.conclusion}
 
 Video URL: ${summary.videoInfo.url}
-              `.trim();
+                `.trim();
 
-              const blob = new Blob([summaryText], { type: 'text/plain' });
-              const url = URL.createObjectURL(blob);
-              const a = document.createElement('a');
-              a.href = url;
-              a.download = `${summary.videoInfo.title.slice(0, 30)}-summary.txt`;
-              document.body.appendChild(a);
-              a.click();
-              document.body.removeChild(a);
-              URL.revokeObjectURL(url);
-            }}
-            className="w-full py-4 bg-red-600 hover:bg-red-700 text-white rounded-xl shadow-lg flex items-center justify-center gap-2 transition-colors duration-200"
-          >
-            <Download className="w-5 h-5" />
-            <span className="font-medium">Download Summary</span>
-          </button>
+                const blob = new Blob([summaryText], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${summary.videoInfo.title.slice(0, 30)}-summary.txt`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+              }}
+              className="w-full py-4 bg-red-600 hover:bg-red-700 text-white rounded-xl shadow-lg flex items-center justify-center gap-2 transition-colors duration-200"
+            >
+              <Download className="w-5 h-5" />
+              <span className="font-medium">Download Summary</span>
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    </Suspense>
   );
 }
 
@@ -215,7 +216,7 @@ function Section({ title, content, isList = false, icon, bgColor = 'bg-gray-50',
           )}
           <h2 className="text-2xl font-bold text-gray-900">{title}</h2>
         </div>
-        
+
         <div className="text-gray-700">
           {isList ? (
             <ul className="space-y-4">
