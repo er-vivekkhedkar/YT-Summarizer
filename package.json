@@ -7,8 +7,6 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "postinstall": "npm dedupe",
-    "clean": "if exist .next rd /s /q .next && if exist node_modules\\.cache rd /s /q node_modules\\.cache",
     "prebuild": "npm run clean"
   },
   "dependencies": {
