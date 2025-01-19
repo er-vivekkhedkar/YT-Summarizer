@@ -13,17 +13,22 @@ export async function POST(req: Request) {
     // 1. Validate video ID and get info
     const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
     const videoInfo = await ytdl.getBasicInfo(videoUrl);
-
-    const { title, description, author, viewCount } = videoInfo.videoDetails;
+    
+    const {
+      title,
+      description,
+      author,
+      viewCount,
+    } = videoInfo.videoDetails;
 
     // 2. Get transcript
     let transcriptText = '';
     try {
       const transcript = await YoutubeTranscript.fetchTranscript(videoId);
       transcriptText = transcript.map(item => item.text).join(' ');
-    } catch {
+    } catch (error) {
       console.log('Using description as fallback');
-      transcriptText = description;
+      transcriptText = description || '';
     }
 
     // 3. Generate summary
@@ -32,15 +37,14 @@ export async function POST(req: Request) {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-        'HTTP-Referer': 'http://localhost:3000',
+        'HTTP-Referer': 'http://localhost:3000'
       },
       body: JSON.stringify({
         model: 'mistralai/mistral-7b-instruct',
-        messages: [
-          {
-            role: 'user',
-            content: `Create a concise summary of this YouTube video:
-            
+        messages: [{
+          role: 'user',
+          content: `Create a concise summary of this YouTube video:
+          
 Title: ${title}
 Channel: ${author.name}
 Content: ${transcriptText}
@@ -55,10 +59,9 @@ Key Takeaways:
 - (takeaway 1)
 - (takeaway 2)
 - (takeaway 3)
-Conclusion: (1-2 sentences)`,
-          },
-        ],
-      }),
+Conclusion: (1-2 sentences)`
+        }]
+      })
     });
 
     if (!response.ok) {
@@ -76,45 +79,35 @@ Conclusion: (1-2 sentences)`,
           title,
           author: author.name,
           views: viewCount,
-          url: videoUrl,
+          url: videoUrl
         },
         content: {
           overview: extractSection(summaryText, 'Overview'),
           mainPoints: extractBulletPoints(summaryText, 'Main Points', 'Key Takeaways'),
           keyTakeaways: extractBulletPoints(summaryText, 'Key Takeaways', 'Conclusion'),
-          conclusion: extractSection(summaryText, 'Conclusion'),
-        },
-      },
+          conclusion: extractSection(summaryText, 'Conclusion')
+        }
+      }
     });
-  } catch (error: unknown) {
+
+  } catch (error: any) {
     console.error('Summarization error:', error);
-
-    const errorMessage =
-      error instanceof Error ? error.message : 'An unknown error occurred';
-
     return NextResponse.json(
-      { success: false, error: errorMessage },
+      { success: false, error: error.message },
       { status: 500 }
     );
   }
 }
 
 function extractSection(text: string, section: string): string {
-  const regex = new RegExp(
-    `${section}:([^]*?)(?=Main Points:|Key Takeaways:|Conclusion:|$)`,
-    'i'
-  );
+  const regex = new RegExp(`${section}:([^]*?)(?=Main Points:|Key Takeaways:|Conclusion:|$)`, 'i');
   return text.match(regex)?.[1]?.trim() || '';
 }
 
-function extractBulletPoints(
-  text: string,
-  startSection: string,
-  endSection: string
-): string[] {
+function extractBulletPoints(text: string, startSection: string, endSection: string): string[] {
   const regex = new RegExp(`${startSection}:([^]*?)(?=${endSection}:|$)`, 'i');
   const section = text.match(regex)?.[1] || '';
-
+  
   return section
     .split('\n')
     .map(line => line.trim())

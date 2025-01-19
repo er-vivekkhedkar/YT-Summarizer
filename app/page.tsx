@@ -13,10 +13,10 @@ import { useState } from 'react'
 
 export default function HomePage() {
   const recentVideos = [
-    { title: "The Future of AI in 2024", image: "https://img.youtube.com/vi/b9GtjIw-afo/maxresdefault.jpg", duration: "10:23" },
+    { title: "The Future of AI in 2024", image: "https://img.youtube.com/vi/SSo_EIwHSd4/maxresdefault.jpg", duration: "10:23" },
     { title: "How to Learn Programming: Full Beginner's Guide", image: "https://img.youtube.com/vi/eWRfhZUzrAc/maxresdefault.jpg", duration: "15:45" },
     { title: "Understanding Blockchain in 10 Minutes", image: "https://img.youtube.com/vi/SSo_EIwHSd4/maxresdefault.jpg", duration: "9:58"  },
-    { title: "The Science of Productivity: How to Get More Done", image: "https://img.youtube.com/vi/Oo0lCZyuF6k/maxresdefault.jpg", duration: "12:34" }
+    { title: "The Science of Productivity: How to Get More Done", image: "https://img.youtube.com/vi/eWRfhZUzrAc/maxresdefault.jpg", duration: "12:34" }
   ];
 
   const features = [

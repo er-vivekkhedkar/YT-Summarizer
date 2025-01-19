@@ -122,7 +122,7 @@ export function SiteHeader() {
                     <DropdownMenuTrigger asChild>
                       <Button 
                         variant="ghost" 
-                        className="relative h-9 rounded-full px-2 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-900 dark:text-white"
+                        className="relative h-9 rounded-full px-2 hover:bg-gray-100  dark:hover:bg-gray-800 text-gray-900 dark:text-white"
                       >
                         <div className="flex items-center space-x-2 text-gray-900 dark:text-white">
                           <Avatar className="h-7 w-7 border border-gray-200 dark:border-gray-700 bg-gray-900 text-white dark:bg-gray-700">

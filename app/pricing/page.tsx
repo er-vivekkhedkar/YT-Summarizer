@@ -122,6 +122,9 @@ export default function PricingPage() {
           <p className="text-center mt-12 text-gray-600">
             All paid plans come with a 14-day free trial. No credit card required for free plan.
           </p>
+          <p className="text-center mt-12 text-gray-600">
+           Pricing feature Coming Soon ...
+          </p>
         </div>
       </section>
     </>
