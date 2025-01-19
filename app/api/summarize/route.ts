@@ -1,5 +1,3 @@
-"use server";
-
 import { NextResponse } from 'next/server';
 import { YoutubeTranscript } from 'youtube-transcript';
 import ytdl from 'ytdl-core';
@@ -12,7 +10,7 @@ export async function POST(req: Request) {
       throw new Error('Please provide a valid YouTube video ID');
     }
 
-    const videoUrl = https://www.youtube.com/watch?v=${videoId};
+    const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
     const videoInfo = await ytdl.getBasicInfo(videoUrl);
 
     const {
@@ -25,7 +23,7 @@ export async function POST(req: Request) {
     let transcriptText = '';
     try {
       const transcript = await YoutubeTranscript.fetchTranscript(videoId);
-      transcriptText = transcript.map(item => item.text).join(' ');
+      transcriptText = transcript.map((item) => item.text).join(' ');
     } catch (error) {
       console.log('Using description as fallback', error);
       transcriptText = description || '';
@@ -35,14 +33,15 @@ export async function POST(req: Request) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': Bearer ${process.env.OPENAI_API_KEY},
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
       },
       body: JSON.stringify({
         model: 'gpt-3.5-turbo',
-        messages: [{
-          role: 'user',
-          content: `Create a concise summary of this YouTube video:
-          
+        messages: [
+          {
+            role: 'user',
+            content: `Create a concise summary of this YouTube video:
+            
 Title: ${title}
 Channel: ${author.name}
 Content: ${transcriptText}
@@ -57,9 +56,10 @@ Key Takeaways:
 - (takeaway 1)
 - (takeaway 2)
 - (takeaway 3)
-Conclusion: (1-2 sentences)`
-        }]
-      })
+Conclusion: (1-2 sentences)`,
+          },
+        ],
+      }),
     });
 
     if (!response.ok) {
@@ -76,15 +76,15 @@ Conclusion: (1-2 sentences)`
           title,
           author: author.name,
           views: viewCount,
-          url: videoUrl
+          url: videoUrl,
         },
         content: {
           overview: extractSection(summaryText, 'Overview'),
           mainPoints: extractBulletPoints(summaryText, 'Main Points', 'Key Takeaways'),
           keyTakeaways: extractBulletPoints(summaryText, 'Key Takeaways', 'Conclusion'),
-          conclusion: extractSection(summaryText, 'Conclusion')
-        }
-      }
+          conclusion: extractSection(summaryText, 'Conclusion'),
+        },
+      },
     });
   } catch (error: unknown) {
     if (error instanceof Error) {
@@ -104,16 +104,16 @@ Conclusion: (1-2 sentences)`
 }
 
 function extractSection(text: string, section: string): string {
-  const regex = new RegExp(${section}:([^]*?)(?=Main Points:|Key Takeaways:|Conclusion:|$), 'i');
+  const regex = new RegExp(`${section}:([^]*?)(?=Main Points:|Key Takeaways:|Conclusion:|$)`, 'i');
   return text.match(regex)?.[1]?.trim() || '';
 }
 
 function extractBulletPoints(text: string, startSection: string, endSection: string): string[] {
-  const regex = new RegExp(${startSection}:([^]*?)(?=${endSection}:|$), 'i');
+  const regex = new RegExp(`${startSection}:([^]*?)(?=${endSection}:|$)`, 'i');
   const section = text.match(regex)?.[1] || '';
   return section
     .split('\n')
-    .map(line => line.trim())
-    .filter(line => line.startsWith('-'))
-    .map(line => line.slice(1).trim());
+    .map((line) => line.trim())
+    .filter((line) => line.startsWith('-'))
+    .map((line) => line.slice(1).trim());
 }
