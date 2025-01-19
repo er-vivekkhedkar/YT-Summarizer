@@ -1,3 +1,5 @@
+"use server";
+
 import { NextResponse } from 'next/server';
 import { YoutubeTranscript } from 'youtube-transcript';
 import ytdl from 'ytdl-core';
