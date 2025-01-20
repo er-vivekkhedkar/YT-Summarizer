@@ -43,12 +43,13 @@ export async function POST(req: Request) {
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
         'HTTP-Referer': 'https://youtubesummarizer.vercel.app/', // Adjust referer if necessary
+        "X-Title": 'YouTube Summarizer',
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'mistralai/mistral-7b-instruct',
+        model: 'openai/gpt-3.5-turbo',
         messages: [{
           role: 'user',
           content: `Create a concise summary of this YouTube video:
