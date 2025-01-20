@@ -7,7 +7,7 @@ import LoadingSpinner from '@/components/LoadingSpinner';
 
 function LoadingSpinnerComponent() {
   return (
-    <div>
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-gray-50 to-white">
       <LoadingSpinner />
     </div>
   );
@@ -42,11 +42,13 @@ const SearchParamsContent = () => {
   const fetchSummary = async (videoId: string) => {
     try {
       setLoading(true);
+      setError('');
       const res = await fetch('/api/summarize', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ videoId }),
       });
+
       const data = await res.json();
       if (!data.success) throw new Error(data.error);
       setSummary(data.summary);
