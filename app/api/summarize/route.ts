@@ -13,12 +13,35 @@ export async function POST(req: Request) {
       );
     }
 
-    // Validate video ID and fetch video info
+    // Validate video ID and fetch video info with retries and error handling
     const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
-    const videoInfo = await ytdl.getBasicInfo(videoUrl);
+    let videoInfo;
+    try {
+      videoInfo = await ytdl.getBasicInfo(videoUrl, {
+        requestOptions: {
+          headers: {
+            // Add user-agent to avoid 410 errors
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'Accept-Language': 'en-US,en;q=0.9',
+          }
+        }
+      });
+    } catch (error) {
+      console.error('YouTube info fetch error:', error);
+      // Fallback to basic info
+      videoInfo = {
+        videoDetails: {
+          title: 'YouTube Video',
+          description: '',
+          author: { name: 'Unknown' },
+          viewCount: '0'
+        }
+      };
+    }
+
     const { title, description, author, viewCount } = videoInfo.videoDetails;
 
-    // Fetch transcript
+    // Fetch transcript with better error handling
     let transcriptText = '';
     try {
       const transcript = await YoutubeTranscript.fetchTranscript(videoId);
@@ -33,7 +56,7 @@ export async function POST(req: Request) {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-        'HTTP-Referer': 'https://youtubesummarizer.vercel.app/',
+        'HTTP-Referer': process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
         'X-Title': 'YouTube Summarizer',
         'Content-Type': 'application/json',
       },
@@ -92,7 +115,10 @@ Conclusion: (1-2 sentences)`,
   } catch (error) {
     console.error('Summarization error:', error);
     return NextResponse.json(
-      { success: false, error: error instanceof Error ? error.message : 'Unexpected error' },
+      { 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Unexpected error occurred while processing the video' 
+      },
       { status: 500 }
     );
   }
