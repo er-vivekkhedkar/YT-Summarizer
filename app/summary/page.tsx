@@ -44,20 +44,27 @@ const SearchParamsContent = () => {
     try {
       setLoading(true);
       setError('');
+      
       const res = await fetch('/api/summarize', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ videoId }),
       });
 
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || 'Failed to fetch summary');
+      }
+
       const data = await res.json();
       if (!data.success) throw new Error(data.error);
       setSummary(data.summary);
     } catch (err: unknown) {
+      console.error('Summary fetch error:', err);
       if (err instanceof Error) {
         setError(err.message);
       } else {
-        setError('An unknown error occurred');
+        setError('An unexpected error occurred');
       }
     } finally {
       setLoading(false);

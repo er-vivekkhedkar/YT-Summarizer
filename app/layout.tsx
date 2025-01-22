@@ -5,12 +5,14 @@ import { SiteFooter } from '@/components/site-footer'
 import { ThemeProvider } from "@/components/ui/theme-provider"
 import NhostClientProvider from '@/components/nhost-provider'
 import { Toaster } from 'react-hot-toast'
+import { Metadata } from 'next'
 
 const inter = Inter({ subsets: ['latin'] })
 
-export const metadata = {
-  title: 'YT Summarizer - AI-Powered YouTube Video Summaries',
-  description: 'Get instant AI-generated summaries of YouTube videos with YT Summarizer. Save time and extract key insights from any video content.',
+export const metadata: Metadata = {
+  title: 'YT Summarizer',
+  description: 'AI-powered YouTube video summarizer',
+  // Add other metadata as needed
 }
 
 export default function RootLayout({

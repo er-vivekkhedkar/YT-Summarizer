@@ -8,6 +8,7 @@ const nextConfig = {
         // Your Turbopack configuration here if needed
       },
     },
+    appDir: true,
   },
   // Remove optimizeCss since it's causing issues with critters
   images: {
@@ -21,6 +22,24 @@ const nextConfig = {
   },
   // Add proper error handling through custom webpack config
   webpack: (config, { isServer }) => {
+    // Handle specific module errors
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        net: false,
+        tls: false,
+        child_process: false,
+      };
+    }
+
+    // Ignore specific warnings
+    config.ignoreWarnings = [
+      { module: /node_modules\/punycode/ },
+      { module: /node_modules\/ytdl-core/ },
+      { module: /node_modules\/youtube-transcript/ },
+    ];
+
     // Optimize chunks and reduce size
     config.optimization = {
       ...config.optimization,
@@ -42,11 +61,6 @@ const nextConfig = {
       },
     }
 
-    // Ignore punycode warning
-    config.ignoreWarnings = [
-      { module: /node_modules\/punycode/ },
-    ]
-
     return config
   },
   // Increase build timeout if needed
@@ -55,6 +69,26 @@ const nextConfig = {
   poweredByHeader: false,
   reactStrictMode: true,
   compress: true,
+  // API and CORS configuration
+  async headers() {
+    return [
+      {
+        source: '/api/:path*',
+        headers: [
+          { key: 'Access-Control-Allow-Credentials', value: 'true' },
+          { key: 'Access-Control-Allow-Origin', value: '*' },
+          { key: 'Access-Control-Allow-Methods', value: 'GET,POST,OPTIONS' },
+          { key: 'Access-Control-Allow-Headers', value: 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version' },
+        ],
+      },
+    ];
+  },
+  // Environment configuration
+  env: {
+    OPENAI_API_KEY: process.env.OPENAI_API_KEY,
+  },
+  // Increase timeouts for API calls
+  serverTimeout: 60000,
 }
 
 module.exports = nextConfig 

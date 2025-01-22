@@ -5,10 +5,14 @@ export function middleware(request: NextRequest) {
   const token = request.cookies.get('nhostSessionToken');
   const isAuthPage = request.nextUrl.pathname.match(/\/(login|signup|forgot-password)/);
 
-  if (!token && !isAuthPage) {
-    return NextResponse.redirect(new URL('/login', request.url));
+  // Only protect dashboard route
+  if (request.nextUrl.pathname.startsWith('/dashboard')) {
+    if (!token) {
+      return NextResponse.redirect(new URL('/login', request.url));
+    }
   }
 
+  // Redirect logged-in users away from auth pages
   if (token && isAuthPage) {
     return NextResponse.redirect(new URL('/dashboard', request.url));
   }
@@ -21,6 +25,6 @@ export const config = {
     '/dashboard/:path*',
     '/login',
     '/signup',
-    '/forgot-password',
+    '/forgot-password'
   ],
 }; 
