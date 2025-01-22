@@ -190,7 +190,7 @@ export function SiteHeader() {
                     </Link>
                     <Link href="/signup" passHref>
                       <Button 
-                        className="rounded-full px-4 text-sm font-medium bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-600 text-white border-0 shadow-lg shadow-red-500/30 hover:shadow-red-500/50 transition-all duration-300"
+                        className="rounded-full px-4 text-sm font-medium bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-600 text-white border-0 shadow-lg shadow-red-500/30 hover:shadow-red-500/50 transition-all duration-300 "
                       >
                         Sign Up
                       </Button>
