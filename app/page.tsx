@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import Link from "next/link"
-import { ArrowRight, CheckCircle, Brain, Share2, LinkIcon, FileText, Tag, Smile, Play } from 'lucide-react'
+import { ArrowRight, CheckCircle, Brain, FileText, Tag, Smile, Play } from 'lucide-react'
 import { VideoCard } from "@/components/video-card"
 import { FeatureCard } from "@/components/feature-card"
 import { ToolCard } from "@/components/tool-card"
